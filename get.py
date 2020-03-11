@@ -50,9 +50,9 @@ def parse_args():
     '''
     parser = argparse.ArgumentParser(description='Process inputs to exchange rate routine.')
     
-    parser.add_argument('base', type = str, default = 'GBP', help = 'The base currency three letter code.')
-    parser.add_argument('target', type = str, default= 'INR', help = 'The target currency three letter code.')
-    parser.add_argument('tuition', type = int, default = 30400, help = 'The total tuition fees in base currency')
+    parser.add_argument('--base', type = str, default = 'GBP', help = 'The base currency three letter code.', required = False)
+    parser.add_argument('--target', type = str, default= 'INR', help = 'The target currency three letter code.', required = False)
+    parser.add_argument('--tuition', type = int, default = 30400, help = 'The total tuition fees in base currency', required = False)
     
     args = parser.parse_args()
     
@@ -81,7 +81,7 @@ def main():
     print('The current {}-{} exchange rate is {}.'.format(base, target, rate))
     
     # Calculate the total fees
-    fees = get_fees(rate, fees)
+    fees = get_fees(rate, tuition)
     print('The total fees at this rate is {}.'.format(fees))
     
     return
