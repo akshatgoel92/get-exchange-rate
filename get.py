@@ -40,7 +40,16 @@ def get_fees(exchange_rate, base_fees):
     '''
     total_fees = exchange_rate*base_fees
     return(total_fees)
+
      
+def get_tuition_balance(tuition, bank_balance):
+    '''
+    ---------------
+    Execute the function calls.
+    ---------------
+    '''
+    return(tuition - bank_balance)
+
 
 def parse_args():
     '''
@@ -49,7 +58,7 @@ def parse_args():
     ---------------
     '''
     parser = argparse.ArgumentParser(description='Process inputs to exchange rate routine.')
-    
+    parser.add_argument('--bank_balance', type = int, help = 'The total bank balance in target currency', required = False)
     parser.add_argument('--base', type = str, default = 'GBP', help = 'The base currency three letter code.', required = False)
     parser.add_argument('--target', type = str, default= 'INR', help = 'The target currency three letter code.', required = False)
     parser.add_argument('--tuition', type = int, default = 30400, help = 'The total tuition fees in base currency', required = False)
@@ -59,8 +68,9 @@ def parse_args():
     base = args.base
     target = args.target
     tuition = args.tuition
+    balance = args.bank_balance
     
-    return(base, target, tuition)
+    return(base, target, tuition, balance)
 
     
 def main():
@@ -70,7 +80,7 @@ def main():
     ---------------
     '''
     # Get the arguments
-    base, target, tuition = parse_args()
+    base, target, tuition, balance = parse_args()
     
     # Get the response
     response = get_data(base, target)
@@ -84,6 +94,11 @@ def main():
     fees = get_fees(rate, tuition)
     print('The total fees at this rate is {}.'.format(fees))
     
+    # Calculate the balance
+    if balance: 
+        balance = get_tuition_balance(fees, balance)
+        print('The total fees at this rate is {}.'.format(balance))
+    
     return
 
 
@@ -94,4 +109,3 @@ if __name__ == '__main__':
     ---------------
     '''
     main()
-    
