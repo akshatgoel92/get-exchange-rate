@@ -1,15 +1,9 @@
 # Imports
-from pylab import mpl, plt
+import plotly.graph_objects as go
 import pandas as pd 
 import numpy as np 
 import requests
 import json
-
-
-# Plot settings
-plt.style.use('seaborn')
-mpl.rcParams['font.family'] = 'serif'
-
 
 
 def get_data(start, end, target, base):
@@ -74,28 +68,31 @@ def get_long_dates(df):
 	return(df)
 
 
-def plot(df):
-	'''
-	------------------
-	Make a line graph
-	------------------
-	'''
-	# Basic figure
-	plt.figure(figsize = (10, 4))
-	plt.plot(df['INR'], linewidth = 1)
-	plt.plot(df['sma'], linewidth = 1, label = "SMA")
-	plt.plot(df['lma'], linewidth = 1, label = "LMA")
-	
-	# Annotations
-	plt.title("GBP-INR Exchange rate")
-	plt.xlabel("Date")
-	plt.ylabel("Time")
-	plt.legend(loc=0)
-	plt.show()
+def get_plot(df):
+    '''
+    ------------------
+    Add moving avgs
+    ------------------
+    '''
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.INR,
+                             mode='lines',
+                             name='Spot Rate'))
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.sma,
+                             mode='lines',
+                             name='Short-term avg.'))
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.lma,
+                             mode='lines', name='Long-term avg.'))
 
-	return(df)
+    fig.update_layout(title='GBP INR Over Time',
+                      xaxis_title='Date',
+                      yaxis_title='INR')
 
-
+    fig.show()
+    
 
 def main():
 	'''
@@ -111,7 +108,7 @@ def main():
 	df = get_moving_avg(df)
 	
 	summarize(df)
-	plot(df)
+	get_plot(df)
 	
 	
 
