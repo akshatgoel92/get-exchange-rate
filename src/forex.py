@@ -7,16 +7,16 @@ import json
 
 
 def get_data(start, end, target, base):
-    '''
-    ----------------------------
-    Get request for time series
-    ----------------------------
-    '''
-    args = 'start_at={}&end_at={}&symbols={}&base={}'
-    url = 'https://api.exchangeratesapi.io/history?' + args
-    response = requests.get(url.format(start, end, target, base))
+	'''
+	----------------------------
+	Get request for time series
+	----------------------------
+	'''
+	args = 'start_at={}&end_at={}&symbols={}&base={}'
+	url = 'https://api.exchangeratesapi.io/history?' + args
+	response = requests.get(url.format(start, end, target, base))
 
-    return(response)
+	return(response)
 
 
 
@@ -26,21 +26,22 @@ def summarize(df):
 	Make a line graph
 	------------------
 	'''
-	print(df.describe())
+	sum = df.describe()
+	return(sum)
 
 
 
 def parse_data(response):
-    '''
-    ----------------------
-    Parse the API response
-    ----------------------
-    '''
-    df = pd.DataFrame(json.loads(response.text)['rates']).T
-    df.index = pd.to_datetime(df.index)
-    df = df.sort_index()
+	'''
+	----------------------
+	Parse the API response
+	----------------------
+	'''
+	df = pd.DataFrame(json.loads(response.text)['rates']).T
+	df.index = pd.to_datetime(df.index)
+	df = df.sort_index()
 
-    return(df)
+	return(df)
 
 
 
@@ -69,30 +70,31 @@ def get_long_dates(df):
 
 
 def get_plot(df):
-    '''
-    ------------------
-    Add moving avgs
-    ------------------
-    '''
-    fig = go.Figure()
-    
-    fig.add_trace(go.Scatter(x=df.index, y=df.INR,
-                             mode='lines',
-                             name='Spot Rate'))
-    
-    fig.add_trace(go.Scatter(x=df.index, y=df.sma,
-                             mode='lines',
-                             name='Short-term avg.'))
-    
-    fig.add_trace(go.Scatter(x=df.index, y=df.lma,
-                             mode='lines', name='Long-term avg.'))
+	'''
+	------------------
+	Add moving avgs
+	------------------
+	'''
+	fig = go.Figure()
+	
+	fig.add_trace(go.Scatter(x=df.index, y=df.INR,
+							 mode='lines',
+							 name='Spot Rate'))
+	
+	fig.add_trace(go.Scatter(x=df.index, y=df.sma,
+							 mode='lines',
+							 name='Short-term avg.'))
+	
+	fig.add_trace(go.Scatter(x=df.index, y=df.lma,
+							 mode='lines', 
+							 name='Long-term avg.'))
 
-    fig.update_layout(title='GBP INR Over Time',
-                      xaxis_title='Date',
-                      yaxis_title='INR')
+	fig.update_layout(title='GBP INR Over Time',
+					  xaxis_title='Date',
+					  yaxis_title='INR')
 
-    fig.show()
-    
+	return(fig)
+	
 
 def main():
 	'''
@@ -100,16 +102,18 @@ def main():
 	Execution goes here
 	------------------
 	'''
-	args = {'start': '2009-01-01', 'end': '2020-07-31',
-			'target': 'INR', 'base': 'GBP'} 
-	
+	args = {'start': '2009-01-01', 'end': '2020-08-26', 
+			'target': 'INR', 
+			'base': 'GBP'}
+
 	response = get_data(**args)
 	df = parse_data(response)
+	
 	df = get_moving_avg(df)
-	
-	summarize(df)
-	get_plot(df)
-	
+	sum = summarize(df)
+	fig = get_plot(df)
+
+	return(sum, fig)
 	
 
 if __name__ == '__main__':
