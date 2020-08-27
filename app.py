@@ -14,11 +14,11 @@ from dash.dependencies import Input, Output
 from src import forex
 from src import ui
 
-# Load UI styles
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 # Get summary and graph
 sum, fig = forex.main()
+
+# Load UI styles
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # Set up application instance
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
