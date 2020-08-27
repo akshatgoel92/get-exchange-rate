@@ -49,7 +49,8 @@ def parse_data(response):
     return(df)
 
 
-def get_moving_avg(df, sma=30, lma =200):
+
+def get_moving_avg(df, sma=30, lma=200):
 	'''
 	------------------
 	Add moving avgs
@@ -57,6 +58,18 @@ def get_moving_avg(df, sma=30, lma =200):
 	'''
 	df['sma'] = df['INR'].rolling(window=sma).mean()
 	df['lma'] = df['INR'].rolling(window=lma).mean()
+
+	return(df)
+
+
+
+def get_long_dates(df):
+	'''
+	------------------
+	Add moving avgs
+	------------------
+	'''
+	df['long'] = (df['sma'] > df['lma']).astype(int) 
 
 	return(df)
 
@@ -81,6 +94,7 @@ def plot(df):
 	plt.show()
 
 	return(df)
+
 
 
 def main():
