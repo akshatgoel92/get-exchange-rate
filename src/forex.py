@@ -27,6 +27,7 @@ def summarize(df):
 	------------------
 	'''
 	sum = df.describe()
+	
 	return(sum)
 
 

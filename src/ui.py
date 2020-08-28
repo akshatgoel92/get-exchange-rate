@@ -12,8 +12,18 @@ import dash_html_components as html
 # From dependencies
 from dash.dependencies import Input, Output
 
-def generate_table(df, max_rows=10):
-    
-    return(html.Table([html.Thead(html.Tr([html.Th(col) for col in df.columns])),
-           html.Tbody([html.Tr([html.Td(df.iloc[i][col]) for col in df.columns]) 
-           for i in range(min(len(df), max_rows))])]))
+
+def gen_dash_table(df):
+
+    table = dash_table.DataTable(id='table', 
+                                 columns=[{"name": i.upper(), "id": i} for i in df.columns],
+                                 data=df.round(2).to_dict('records'), 
+                                 style_header={ 'border': '1px solid black'},
+                                 style_cell={ 'border': '1px solid grey', 
+                                              'minWidth': '10%', 
+                                              'width': '10%', 
+                                              'maxWidth': '10%',
+                                              'textAlign': 'left'}, 
+                                 style_table={ 'width': '20%', 'margin': '7%'},)
+
+    return(table)

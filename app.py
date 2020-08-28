@@ -14,6 +14,9 @@ from dash.dependencies import Input, Output
 from src import forex
 from src import ui
 
+# Set display format
+pd.options.display.float_format = '{:,.2f}'.format
+
 # Get summary and graph
 sum, fig = forex.main()
 
@@ -27,7 +30,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 graph = dcc.Graph(figure=fig)
 
 # Table
-table = ui.generate_table(sum)
+table = ui.gen_dash_table(sum)
 
 # Create app layout
 app.layout = html.Div([graph, table])
