@@ -1,111 +1,95 @@
-# Import packages
-import pandas as pd
-import argparse
+# Imports
+import pandas as pd 
+import numpy as np 
 import requests
 import json
 
 
-def get_data(base = 'GBP', target = 'INR'):
-    '''
-    -----------
-    Make GET request to foreign exchange API for given
-    base and target currencies.
-    -----------
-    '''
-    url = 'https://api.exchangeratesapi.io/latest?base={}&symbols={}'
-    response = requests.get(url.format(base, target))
-                            
-    return(response)
+def get_data(start, end, target, base):
+	'''
+	----------------------------
+	Get request for time series
+	----------------------------
+	'''
+	args = 'start_at={}&end_at={}&symbols={}&base={}'
+	url = 'https://api.exchangeratesapi.io/history?' + args
+	response = requests.get(url.format(start, end, target, base))
+
+	return(response)
+
+
+
+def summarize(df):
+	'''
+	------------------
+	Make a line graph
+	------------------
+	'''
+	sum = df.describe()
+	
+	return(sum)
+
 
 
 def parse_data(response):
-    '''
-    -------------
-    Parse the API response to get float exchange rate.
-    -------------
-    '''
-    # Parse the API response
-    rate = json.loads(response.text)['rates']['INR']
-    
-    return(rate)
+	'''
+	----------------------
+	Parse the API response
+	----------------------
+	'''
+	df = pd.DataFrame(json.loads(response.text)['rates']).T
+	df.index = pd.to_datetime(df.index)
+	df = df.sort_index()
+
+	return(df)
 
 
-def get_fees(exchange_rate, base_fees):
-    '''
-    --------------
-    Inputs: Exchange rate
-    Inputs: Fees in base currency
-    Output: Total tuition fees in target currency
-    --------------
-    '''
-    total_fees = exchange_rate*base_fees
-    return(total_fees)
 
-     
-def get_tuition_balance(tuition, bank_balance):
-    '''
-    ---------------
-    Execute the function calls.
-    ---------------
-    '''
-    return(tuition - bank_balance)
+def get_moving_avg(df, sma=30, lma=200):
+	'''
+	------------------
+	Add moving avgs
+	------------------
+	'''
+	df['sma'] = df['INR'].rolling(window=sma).mean()
+	df['lma'] = df['INR'].rolling(window=lma).mean()
+
+	return(df)
 
 
-def parse_args():
-    '''
-    ---------------
-    Parse command line arguments here.
-    ---------------
-    '''
-    parser = argparse.ArgumentParser(description='Process inputs to exchange rate routine.')
-    parser.add_argument('--bank_balance', type = int, help = 'The total bank balance in target currency', required = False)
-    parser.add_argument('--base', type = str, default = 'GBP', help = 'The base currency three letter code.', required = False)
-    parser.add_argument('--target', type = str, default= 'INR', help = 'The target currency three letter code.', required = False)
-    parser.add_argument('--tuition', type = int, default = 30400, help = 'The total tuition fees in base currency', required = False)
-    
-    args = parser.parse_args()
-    
-    base = args.base
-    target = args.target
-    tuition = args.tuition
-    balance = args.bank_balance
-    
-    return(base, target, tuition, balance)
 
-    
+def get_long_dates(df):
+	'''
+	------------------
+	Add moving avgs
+	------------------
+	'''
+	df['long'] = (df['sma'] > df['lma']).astype(int) 
+
+	return(df)
+
+
+
 def main():
-    '''
-    ---------------
-    Execute the function calls.
-    ---------------
-    '''
-    # Get the arguments
-    base, target, tuition, balance = parse_args()
-    
-    # Get the response
-    response = get_data(base, target)
-    print(response.text)
-    
-    # Parse the data properly
-    rate = parse_data(response)
-    print('The current {}-{} exchange rate is {}.'.format(base, target, rate))
-    
-    # Calculate the total fees
-    fees = get_fees(rate, tuition)
-    print('The total fees at this rate is {}.'.format(fees))
-    
-    # Calculate the balance
-    if balance: 
-        balance = get_tuition_balance(fees, balance)
-        print('The total fees at this rate is {}.'.format(balance))
-    
-    return
+	'''
+	------------------
+	Execution goes here
+	------------------
+	'''
+	args = {'start': '2009-01-01', 'end': '2020-08-26', 
+			'target': 'INR', 
+			'base': 'GBP'}
 
+	response = get_data(**args)
+	df = parse_data(response)
+	
+	df = get_moving_avg(df)
+	sum = summarize(df)
+	fig = get_plot(df)
+
+	return(sum, fig, df)
+	
 
 if __name__ == '__main__':
-    '''
-    ---------------
-    Call main function.
-    ---------------
-    '''
-    main()
+
+	main()

@@ -6,7 +6,7 @@ import gpytorch
 from matplotlib import pyplot as plt
 
 
-# We will use the simplest form of GP model, exact inference
+
 class ExactGPModel(gpytorch.models.ExactGP):
     
     
@@ -33,6 +33,7 @@ class ExactGPModel(gpytorch.models.ExactGP):
         '''
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
+        
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 
@@ -45,15 +46,14 @@ def get_data(df):
     ___________________
     '''
     # Training data is 100 points in [0,1] inclusive regularly spaced
-    train_x = torch.(df.iloc[:,:-1])
-    # True function is sin(2*pi*x) with Gaussian noise
-    train_y = torch(df[-1])
+    train_x = torch.tensor(df.iloc[:,:-1])
+    train_y = torch.tensor(df[-1])
 
     print(train_x)
-
     print(train_y)
 
     return(train_x, train_y)
+
 
 
 def train(train_x, train_y, training_iter=100):
@@ -99,7 +99,7 @@ def train(train_x, train_y, training_iter=100):
     return(model, likelihood)
 
 
-def predict(model, likelihood, test_x):
+def predict(model, likelihood, test_x, size=1000):
     '''
     ___________________
     Forward propogation
@@ -114,7 +114,7 @@ def predict(model, likelihood, test_x):
     f_var = f_preds.variance
     
     f_covar = f_preds.covariance_matrix
-    f_samples = f_preds.sample(sample_shape=torch.Size(1000,))
+    f_samples = f_preds.sample(sample_shape=torch.Size(size,))
 
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
 
@@ -127,7 +127,6 @@ def main():
     > Outputs: 
     ___________________
     '''
-
     train_x, train_y = get_data()
     model, likelihood = train(train_x, train_y)
 
