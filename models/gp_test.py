@@ -1,6 +1,7 @@
 import os
 import math
 import torch
+import forex
 import gpytorch
 from matplotlib import pyplot as plt
 
@@ -35,7 +36,7 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 
-def get_data():
+def get_data(df):
     '''
     ___________________
     Forward propogation
@@ -44,9 +45,13 @@ def get_data():
     ___________________
     '''
     # Training data is 100 points in [0,1] inclusive regularly spaced
-    train_x = torch.linspace(0, 1, 100)
+    train_x = torch.(df.iloc[:,:-1])
     # True function is sin(2*pi*x) with Gaussian noise
-    train_y = torch.sin(train_x * (2 * math.pi)) + torch.randn(train_x.size()) * math.sqrt(0.04)
+    train_y = torch(df[-1])
+
+    print(train_x)
+
+    print(train_y)
 
     return(train_x, train_y)
 
@@ -122,6 +127,7 @@ def main():
     > Outputs: 
     ___________________
     '''
+
     train_x, train_y = get_data()
     model, likelihood = train(train_x, train_y)
 

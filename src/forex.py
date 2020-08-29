@@ -70,32 +70,8 @@ def get_long_dates(df):
 	return(df)
 
 
-def get_plot(df):
-	'''
-	------------------
-	Add moving avgs
-	------------------
-	'''
-	fig = go.Figure()
-	
-	fig.add_trace(go.Scatter(x=df.index, y=df.INR,
-							 mode='lines',
-							 name='Spot Rate'))
-	
-	fig.add_trace(go.Scatter(x=df.index, y=df.sma,
-							 mode='lines',
-							 name='Short-term avg.'))
-	
-	fig.add_trace(go.Scatter(x=df.index, y=df.lma,
-							 mode='lines', 
-							 name='Long-term avg.'))
 
-	fig.update_layout(title='GBP INR Over Time',
-					  xaxis_title='Date',
-					  yaxis_title='INR')
 
-	return(fig)
-	
 
 def main():
 	'''
@@ -114,7 +90,7 @@ def main():
 	sum = summarize(df)
 	fig = get_plot(df)
 
-	return(sum, fig)
+	return(sum, fig, df)
 	
 
 if __name__ == '__main__':

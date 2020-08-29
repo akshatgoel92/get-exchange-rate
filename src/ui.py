@@ -13,10 +13,42 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 
-def gen_dash_table(df):
+def get_plot(df):
+    '''
+    ------------------
+    Add moving avgs
+    ------------------
+    '''
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.INR,
+                             mode='lines',
+                             name='Spot Rate'))
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.sma,
+                             mode='lines',
+                             name='Short-term avg.'))
+    
+    fig.add_trace(go.Scatter(x=df.index, y=df.lma,
+                             mode='lines', 
+                             name='Long-term avg.'))
 
+    fig.update_layout(title='GBP INR Over Time',
+                      xaxis_title='Date',
+                      yaxis_title='INR')
+
+    return(fig)
+
+
+def get_dash_table(df):
+    '''
+    ------------------
+    Add moving avgs
+    ------------------
+    '''
     table = dash_table.DataTable(id='table', 
-                                 columns=[{"name": i.upper(), "id": i} for i in df.columns],
+                                 columns=[{"name": i.upper(), "id": i} 
+                                          for i in df.columns],
                                  data=df.round(2).to_dict('records'), 
                                  style_header={ 'border': '1px solid black'},
                                  style_cell={ 'border': '1px solid grey', 

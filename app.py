@@ -1,6 +1,7 @@
 # Import packages
 import json
 import dash
+import torch
 import dash_table
 import pandas as pd
 import plotly.express as px
@@ -14,11 +15,11 @@ from dash.dependencies import Input, Output
 from src import forex
 from src import ui
 
-# Set display format
-pd.options.display.float_format = '{:,.2f}'.format
-
 # Get summary and graph
-sum, fig = forex.main()
+sum, fig, df = forex.main()
+
+# Get machine learning predictions
+# Still to write
 
 # Load UI styles
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
