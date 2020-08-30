@@ -1,2 +1,4 @@
 src/__pycache__/*
 .python-version
+models/__pycache__/
+models/__pycache__/gp_test.cpython-37.pyc
