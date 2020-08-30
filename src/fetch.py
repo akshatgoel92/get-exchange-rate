@@ -69,7 +69,7 @@ def get_long_dates(df):
 	return(df)
 
 
-def get_data(df):
+def get_gp_data(df):
     '''
     ________________________
     Convert data to tensors

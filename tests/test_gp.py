@@ -1,4 +1,4 @@
-import models.gp_test as gp
+import models.gp as gp
 import pandas as pd
 import numpy as np
 import unittest
@@ -15,8 +15,8 @@ class TestExactGP(unittest.TestCase):
     def setUp(self):
         '''
         ----------------------
-        > Input: 
-        > Output: 
+        Input: 
+        Output: 
         ----------------------
         '''
         # Set seed
@@ -36,8 +36,8 @@ class TestExactGP(unittest.TestCase):
     def test_train_model_type(self):
         '''
         ----------------------
-        > Input: 
-        > Output: 
+        Input: 
+        Output: 
         ----------------------
         '''
         self.assertEqual(type(self.model), gp.ExactGPModel)
@@ -46,12 +46,24 @@ class TestExactGP(unittest.TestCase):
     def test_train_likelihood_type(self):
         '''
         ----------------------
-        > Input: 
-        > Output: 
+        Input: 
+        Output: 
         ----------------------
         '''
         self.assertEqual(type(self.likelihood), GaussianLikelihood)
 
+
+    def test_integration_gp(self):
+        '''
+        ----------------------
+        Input: 
+        Output: 
+        ----------------------
+        '''
+        try: 
+            gp.main()
+        except Exception as e:
+            self.fail(e)
 
 
 if __name__ == '__main__':
