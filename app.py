@@ -12,14 +12,14 @@ import dash_html_components as html
 
 # From dependencies
 from dash.dependencies import Input, Output
-from src import forex
+from src import fetch
 from src import ui
 
 # Get summary and graph
-sum, fig, df = forex.main()
+sum, df = fetch.main()
 
 # Get machine learning predictions
-# Still to write
+
 
 # Load UI styles
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']

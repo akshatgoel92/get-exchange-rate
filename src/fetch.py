@@ -85,9 +85,8 @@ def main():
 	
 	df = get_moving_avg(df)
 	sum = summarize(df)
-	fig = get_plot(df)
 
-	return(sum, fig, df)
+	return(sum, df)
 	
 
 if __name__ == '__main__':

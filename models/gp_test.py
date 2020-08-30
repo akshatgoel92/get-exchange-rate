@@ -1,8 +1,9 @@
 import os
 import math
 import torch
-import forex
 import gpytorch
+import numpy as np
+import src.fetch as fetch
 from matplotlib import pyplot as plt
 
 
@@ -12,11 +13,9 @@ class ExactGPModel(gpytorch.models.ExactGP):
     
     def __init__(self, train_x, train_y, likelihood):
         '''
-        ___________________
-        Forward propogation
-        > Inputs:
-        > Outputs: 
-        _____
+        ______________________
+        Initialize a GP model
+        ______________________
         '''
         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.ConstantMean()
@@ -25,11 +24,9 @@ class ExactGPModel(gpytorch.models.ExactGP):
     
     def forward(self, x):
         '''
-        ___________________
-        Forward propogation
-        > Inputs:
-        > Outputs: 
-        ___________________
+        _________________________________
+        Send data forward through the GP
+        _________________________________
         '''
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
@@ -39,29 +36,24 @@ class ExactGPModel(gpytorch.models.ExactGP):
 
 def get_data(df):
     '''
-    ___________________
-    Forward propogation
-    > Inputs:
-    > Outputs: 
-    ___________________
+    ________________________
+    Convert data to tensors
+    ________________________
     '''
     # Training data is 100 points in [0,1] inclusive regularly spaced
-    train_x = torch.tensor(df.iloc[:,:-1])
-    train_y = torch.tensor(df[-1])
+    train_x = torch.from_numpy(np.array(df['INR'].shift(1)[1:])).float()
+    train_y = torch.from_numpy(np.array(df['INR'][:-1])).float()
 
-    print(train_x)
-    print(train_y)
+    train_x = torch.autograd.Variable(train_x).float()
+    train_y = torch.autograd.Variable(train_y).float()
 
     return(train_x, train_y)
 
 
-
-def train(train_x, train_y, training_iter=100):
+def train(train_x, train_y, training_iter):
     '''
     ___________________
-    Forward propogation
-    > Inputs:
-    > Outputs: 
+    Training loop
     ___________________
     '''
     # Initialize likelihood and model
@@ -99,37 +91,38 @@ def train(train_x, train_y, training_iter=100):
     return(model, likelihood)
 
 
-def predict(model, likelihood, test_x, size=1000):
+def predict(model, likelihood, spot_rate, size=1000):
     '''
-    ___________________
-    Forward propogation
-    > Inputs:
-    > Outputs: 
-    ___________________
+    ___________________________
+    Get posterior + predictive
+    ___________________________
     '''
+    test_x = torch.tensor([spot_rate]).float()
+    test_x = torch.autograd.Variable(test_x).float()
+
+    model.eval()
+    likelihood.eval()
+
     f_preds = model(test_x)
-    y_preds = likelihood(model(test_x))
+    y_preds = likelihood(model(f_preds))
 
     f_mean = f_preds.mean
     f_var = f_preds.variance
     
     f_covar = f_preds.covariance_matrix
-    f_samples = f_preds.sample(sample_shape=torch.Size(size,))
+    f_samples = f_preds.sample(sample_shape=torch.Size((size,)))
 
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
 
 
-def main():
+def main(df, spot_rate):
     '''
     ___________________
-    Forward propogation
-    > Inputs:
-    > Outputs: 
+    Execute code
     ___________________
     '''
-    train_x, train_y = get_data()
+    torch.manual_seed(10)
+    train_x, train_y = get_data(df)
+    
     model, likelihood = train(train_x, train_y)
-
-
-if __name__ == '__main__':
-    main()
+    f_preds, y_preds, f_mean, f_var, f_covar, f_samples = predict(model, likelihood, spot_rate)
