@@ -34,23 +34,6 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 
-def get_data(df):
-    '''
-    ________________________
-    Convert data to tensors
-    ________________________
-    '''
-    # Prepare the training data
-    train_x = torch.from_numpy(np.array(df['INR'].shift(1)[1:])).float()
-    train_y = torch.from_numpy(np.array(df['INR'][:-1])).float()
-
-    # Wrap the training data in a variable object
-    train_x = torch.autograd.Variable(train_x).float()
-    train_y = torch.autograd.Variable(train_y).float()
-
-    return(train_x, train_y)
-
-
 def train(train_x, train_y, training_iter, lr):
     '''
     ___________________
