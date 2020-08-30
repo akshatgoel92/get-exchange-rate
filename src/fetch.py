@@ -23,13 +23,13 @@ def get_data(start, end, target, base):
 	return(response)
 
 
-def parse_data(response):
+def parse_data(df_string):
 	'''
 	----------------------
 	Parse the API response
 	----------------------
 	'''
-	df = pd.DataFrame(json.loads(response.text)['rates']).T
+	df = pd.DataFrame(json.loads(df_string)['rates']).T
 	df.index = pd.to_datetime(df.index)
 	df = df.sort_index()
 
@@ -103,7 +103,7 @@ def main():
 			'base': 'GBP'}
 
 	response = get_data(**args)
-	df = parse_data(response)
+	df = parse_data(response.text)
 	
 	df = get_moving_avg(df)
 	sum = summarize(df)
