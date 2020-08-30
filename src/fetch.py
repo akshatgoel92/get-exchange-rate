@@ -1,8 +1,13 @@
 # Imports
 import pandas as pd 
-import numpy as np 
+import numpy as np
+import gpytorch
 import requests
+import torch
 import json
+
+
+
 
 
 def get_data(start, end, target, base):
@@ -16,19 +21,6 @@ def get_data(start, end, target, base):
 	response = requests.get(url.format(start, end, target, base))
 
 	return(response)
-
-
-
-def summarize(df):
-	'''
-	------------------
-	Make a line graph
-	------------------
-	'''
-	sum = df.describe()
-	
-	return(sum)
-
 
 
 def parse_data(response):
@@ -67,6 +59,19 @@ def get_long_dates(df):
 	df['long'] = (df['sma'] > df['lma']).astype(int) 
 
 	return(df)
+
+
+
+def summarize(df):
+	'''
+	------------------
+	Make a line graph
+	------------------
+	'''
+	sum = df.describe()
+	
+	return(sum)
+
 
 
 def get_gp_data(df):
