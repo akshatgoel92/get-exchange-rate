@@ -70,7 +70,7 @@ def train(train_x, train_y, training_iter, lr):
 def predict(model, likelihood, spot_rate, size=1000):
     '''
     ----------------------------------
-    Get posterior and predictive dist.
+    Get posterior and predictive
     ----------------------------------
     '''
     test_x = torch.tensor([spot_rate]).float()
@@ -90,14 +90,13 @@ def predict(model, likelihood, spot_rate, size=1000):
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
 
 
-def main(spot_rate=100):
+def main(df, spot_rate=100):
     '''
     ---------------------------------
     Execute code
     ---------------------------------
     '''
     torch.manual_seed(10)
-    train_x, train_y = fetch.get_gp_data(df)
     model, likelihood = train(train_x, train_y)
     predictions = predict(model, likelihood, spot_rate)
 

@@ -52,19 +52,5 @@ class TestExactGP(unittest.TestCase):
         '''
         self.assertEqual(type(self.likelihood), GaussianLikelihood)
 
-
-    def test_integration_gp(self):
-        '''
-        ----------------------
-        Input: 
-        Output: 
-        ----------------------
-        '''
-        try: 
-            gp.main()
-        except Exception as e:
-            self.fail(e)
-
-
 if __name__ == '__main__':
     unittest.main()
