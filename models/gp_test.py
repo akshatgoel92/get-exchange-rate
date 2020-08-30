@@ -134,3 +134,5 @@ def main(df, spot_rate):
     model, likelihood = train(train_x, train_y)
     # Get the results we need
     f_preds, y_preds, f_mean, f_var, f_covar, f_samples = predict(model, likelihood, spot_rate)
+    # Return statements
+    return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
