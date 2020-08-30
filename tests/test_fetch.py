@@ -35,14 +35,6 @@ class TestDataFetch(unittest.TestCase):
     def test_fig_type(self):
         self.assertEqual(type(self.fig), go.Figure)
     
-    def tearDown(self):
-
-        del self.response
-        del self.df
-        del self.sum
-        del self.fig
-
-
 
 if __name__ == '__main__':
     unittest.main()
