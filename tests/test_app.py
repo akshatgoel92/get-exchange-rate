@@ -10,6 +10,15 @@ import math
 class TestApp(unittest.TestCase):
 
 
+    def setUp():
+        '''
+        ----------------------
+        Input: 
+        Output: 
+        ----------------------
+        '''
+
+
     def test_integration_gp(self):
         '''
         ----------------------
@@ -18,7 +27,7 @@ class TestApp(unittest.TestCase):
         ----------------------
         '''
         try: 
-            gp.main()
+            gp.main(self.df)
         except Exception as e:
             self.fail(e)
 

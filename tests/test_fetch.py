@@ -34,6 +34,12 @@ class TestDataFetch(unittest.TestCase):
 
     def test_fig_type(self):
         self.assertEqual(type(self.fig), go.Figure)
+
+    def test_data(self):
+        self.assertEqual(type(self.fig), go.Figure)
+
+    def test_gp_data(self):
+        pass
     
 
 if __name__ == '__main__':
