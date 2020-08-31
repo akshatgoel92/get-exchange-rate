@@ -84,7 +84,7 @@ def get_predict_datasets(new_points, data=None):
 
 
 
-def predict(model, likelihood, test_x, size=1000):
+def predict(model, likelihood, test_x, size):
     '''
     ----------------------------------
     Get posterior and predictive
@@ -94,26 +94,24 @@ def predict(model, likelihood, test_x, size=1000):
     likelihood.eval()
     
     f_preds = model(test_x)
-    y_preds = likelihood(model(test_x))
-
     f_mean = f_preds.mean
     f_var = f_preds.variance
     f_covar = f_preds.covariance_matrix
     f_samples = f_preds.sample(sample_shape=torch.Size((size,)))
-    print(f_samples.shape)
 
-    return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
+    y_preds = likelihood(f_preds)
+    y_upper, y_lower = y_preds.confidence_region()
+
+    return(f_preds, f_mean, f_var, f_covar, f_samples, y_preds, y_upper, y_lower)
 
 
 
-def get_plot(observed_pred, train_x, train_y, test_x):
+def get_plot(observed_pred, y_preds, y_upper, y_lower):
 
 
     with torch.no_grad():
         # Initialize plot
         f, ax = plt.subplots(1, 1, figsize=(4, 3))
-        # Get upper and lower confidence bounds
-        lower, upper = observed_pred.confidence_region()
         # Plot training data as black stars
         ax.plot(train_x.numpy(), train_y.numpy(), 'r')
         # Plot predictive means as blue line
@@ -128,7 +126,9 @@ def get_plot(observed_pred, train_x, train_y, test_x):
         plt.show()
 
 
-def main(train_x, train_y, spot_rate=[97.91], training_iter=10, lr=0.1):
+def main(train_x, train_y, 
+         spot_rate=[97.91], upper_bound = [100], 
+         lower_bound = [90], training_iter=10, lr=0.1, size=1000):
     '''
     ---------------------------------
     Execute code
@@ -141,7 +141,7 @@ def main(train_x, train_y, spot_rate=[97.91], training_iter=10, lr=0.1):
     # Construct test set
     test_x, _ = get_predict_datasets(spot_rate)
     # Make predictions
-    predictions = predict(model, likelihood, test_x)
+    predictions = predict(model, likelihood, test_x, size)
     # Construct datasets for plotting: posterior mean
     mean_line = get_predict_datasets(spot_rate, train_x)
     # Posterior upper bound
