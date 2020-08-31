@@ -86,8 +86,8 @@ def predict(model, likelihood, test_x, size=1000):
     Get posterior and predictive
     ----------------------------------
     '''
-    likelihood.eval()
     model.eval()
+    likelihood.eval()
     
     f_preds = model(test_x)
     y_preds = likelihood(model(test_x))
@@ -100,7 +100,7 @@ def predict(model, likelihood, test_x, size=1000):
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
 
 
-def get_plot(test_x, observed_pred, train_x, train_y, test_x):
+def get_plot(observed_pred, train_x, train_y, test_x):
 
 
     with torch.no_grad():
@@ -132,12 +132,13 @@ def main(train_x, train_y, spot_rate=97.91, training_iter=20, lr=0.1):
     torch.manual_seed(10)
     # Store trained model and likelihood
     model, likelihood = train(train_x, train_y, training_iter, lr)
-    # Construct test set and make predictions
+    # Construct test set
     test_x = get_test_set(train_x, spot_rate)
+    # Make predictions
     predictions = predict(model, likelihood, test_x)
     # Store spot rate predictions
-    y_preds = prediction[1]
+    y_preds = predictions[1]
     # Plot the results
-    get_plot(test_x, y_preds, train_x, train_y, test_x)
+    get_plot(y_preds, train_x, train_y, test_x)
 
     return(predictions)
