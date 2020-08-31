@@ -34,6 +34,7 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
 
 
+
 def train(train_x, train_y, training_iter, lr):
     '''
     ---------------------------------
@@ -67,16 +68,19 @@ def train(train_x, train_y, training_iter, lr):
     return(model, likelihood)
 
 
-def get_test_set(train_x, spot_rate):
+
+def get_predict_datasets(new_points, data=None):
     '''
     ----------------------------------
     Get posterior and predictive
     ----------------------------------
     '''
-    new_points = torch.autograd.Variable(torch.tensor([spot_rate])).float()
-    test_x = torch.cat((train_x, new_points))
+    # Convert new points to a Tensor
+    new_tensor = torch.autograd.Variable(torch.tensor(new_points)).float()
+    # Concatenate
+    full_data = torch.cat((data, new_tensor)) if data is not None else None
 
-    return(test_x)
+    return(new_tensor, full_data)
 
 
 
@@ -96,8 +100,10 @@ def predict(model, likelihood, test_x, size=1000):
     f_var = f_preds.variance
     f_covar = f_preds.covariance_matrix
     f_samples = f_preds.sample(sample_shape=torch.Size((size,)))
+    print(f_samples.shape)
 
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
+
 
 
 def get_plot(observed_pred, train_x, train_y, test_x):
@@ -122,7 +128,7 @@ def get_plot(observed_pred, train_x, train_y, test_x):
         plt.show()
 
 
-def main(train_x, train_y, spot_rate=97.91, training_iter=20, lr=0.1):
+def main(train_x, train_y, spot_rate=[97.91], training_iter=10, lr=0.1):
     '''
     ---------------------------------
     Execute code
@@ -133,9 +139,15 @@ def main(train_x, train_y, spot_rate=97.91, training_iter=20, lr=0.1):
     # Store trained model and likelihood
     model, likelihood = train(train_x, train_y, training_iter, lr)
     # Construct test set
-    test_x = get_test_set(train_x, spot_rate)
+    test_x, _ = get_predict_datasets(spot_rate)
     # Make predictions
     predictions = predict(model, likelihood, test_x)
+    # Construct datasets for plotting: posterior mean
+    mean_line = get_predict_datasets(spot_rate, train_x)
+    # Posterior upper bound
+    upper_bound = get_predict_datasets(upper_bound, train_x)
+    # Poterior lower bound 
+    lower_bound = get_predict_datasets(lower_bound, train_x)
     # Store spot rate predictions
     y_preds = predictions[1]
     # Plot the results
