@@ -109,8 +109,9 @@ def main():
 	
 	df = get_moving_avg(df)
 	sum = summarize_data(df)
+	train_x, train_y = get_gp_data(df)
 
-	return(sum, df)
+	return(sum, df, train_x, train_y)
 	
 
 if __name__ == '__main__':

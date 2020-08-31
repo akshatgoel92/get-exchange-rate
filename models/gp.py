@@ -67,20 +67,30 @@ def train(train_x, train_y, training_iter, lr):
     return(model, likelihood)
 
 
-def predict(model, likelihood, spot_rate, size=1000):
+def get_test_set(train_x, spot_rate):
     '''
     ----------------------------------
     Get posterior and predictive
     ----------------------------------
     '''
-    test_x = torch.tensor([spot_rate]).float()
-    test_x = torch.autograd.Variable(test_x).float()
+    new_points = torch.autograd.Variable(torch.tensor([spot_rate])).float()
+    test_x = torch.cat((train_x, new_points))
 
-    model.eval()
+    return(test_x)
+
+
+
+def predict(model, likelihood, test_x, size=1000):
+    '''
+    ----------------------------------
+    Get posterior and predictive
+    ----------------------------------
+    '''
     likelihood.eval()
-
+    model.eval()
+    
     f_preds = model(test_x)
-    y_preds = likelihood(model(f_preds))
+    y_preds = likelihood(model(test_x))
 
     f_mean = f_preds.mean
     f_var = f_preds.variance
@@ -90,14 +100,44 @@ def predict(model, likelihood, spot_rate, size=1000):
     return(f_preds, y_preds, f_mean, f_var, f_covar, f_samples)
 
 
-def main(df, spot_rate=100):
+def get_plot(test_x, observed_pred, train_x, train_y, test_x):
+
+
+    with torch.no_grad():
+        # Initialize plot
+        f, ax = plt.subplots(1, 1, figsize=(4, 3))
+        # Get upper and lower confidence bounds
+        lower, upper = observed_pred.confidence_region()
+        # Plot training data as black stars
+        ax.plot(train_x.numpy(), train_y.numpy(), 'r')
+        # Plot predictive means as blue line
+        ax.plot(test_x.numpy(), observed_pred.mean.numpy(), 'b')
+        # Shade between the lower and upper confidence bounds
+        ax.fill_between(test_x.numpy(), lower.numpy(), upper.numpy(), alpha=0.5)
+        # Set y-axis delimiters
+        ax.set_ylim([60, 110])
+        # Set axis legends
+        ax.legend(['Observed Data', 'Mean', 'Confidence'])
+        # Show
+        plt.show()
+
+
+def main(train_x, train_y, spot_rate=97.91, training_iter=20, lr=0.1):
     '''
     ---------------------------------
     Execute code
     ---------------------------------
     '''
+    # Set random seed for reproduciblity
     torch.manual_seed(10)
-    model, likelihood = train(train_x, train_y)
-    predictions = predict(model, likelihood, spot_rate)
+    # Store trained model and likelihood
+    model, likelihood = train(train_x, train_y, training_iter, lr)
+    # Construct test set and make predictions
+    test_x = get_test_set(train_x, spot_rate)
+    predictions = predict(model, likelihood, test_x)
+    # Store spot rate predictions
+    y_preds = prediction[1]
+    # Plot the results
+    get_plot(test_x, y_preds, train_x, train_y, test_x)
 
     return(predictions)

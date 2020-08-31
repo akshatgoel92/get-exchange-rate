@@ -1,36 +1,30 @@
-import models.gp as gp
-import pandas as pd
-import numpy as np
-import unittest
-import gpytorch
+# Import packages
+import json
+import dash
 import torch
-import math
+import dash_table
+import pandas as pd
+import plotly.express as px
+
+# Dash dependencies
+import dash_core_components as dcc
+import dash_html_components as html
+
+# From dependencies
+from dash.dependencies import Input, Output
+from models import gp
+from src import fetch
+from src import ui
 
 
-class TestApp(unittest.TestCase):
+def main():
+    
+    # Get summary and graph
+    sum, df, train_x, train_y = fetch.main()
 
-
-    def setUp():
-        '''
-        ----------------------
-        Input: 
-        Output: 
-        ----------------------
-        '''
-
-
-    def test_integration_gp(self):
-        '''
-        ----------------------
-        Input: 
-        Output: 
-        ----------------------
-        '''
-        try: 
-            gp.main(self.df)
-        except Exception as e:
-            self.fail(e)
+    # Get machine learning predictions
+    gp.main(train_x, train_y)
 
 
 if __name__ == '__main__':
-    unittest.main()
+    main()

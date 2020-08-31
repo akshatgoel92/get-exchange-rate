@@ -28,7 +28,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Graph
-graph = dcc.Graph(figure=fig)
+graph = dcc.Graph(figure=ui.get_plot(df))
 
 # Table
 table = ui.gen_dash_table(sum)
