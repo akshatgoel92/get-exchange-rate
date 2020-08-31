@@ -1,10 +1,12 @@
 # Imports
 import pandas as pd 
 import numpy as np
-import gpytorch
 import requests
-import torch
 import json
+
+# Import torch
+import gpytorch
+import torch
 
 
 
@@ -62,7 +64,7 @@ def get_long_dates(df):
 
 
 
-def summarize(df):
+def summarize_data(df):
 	'''
 	------------------
 	Make a line graph
@@ -106,7 +108,7 @@ def main():
 	df = parse_data(response.text)
 	
 	df = get_moving_avg(df)
-	sum = summarize(df)
+	sum = summarize_data(df)
 
 	return(sum, df)
 	
