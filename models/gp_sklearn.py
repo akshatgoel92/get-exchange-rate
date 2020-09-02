@@ -7,6 +7,7 @@ from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 
 
 
+
 def get_data():
     '''
     ===========================
@@ -95,8 +96,6 @@ def main():
     Output:
     ===========================
     '''
-    
-    
     kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
     alpha = dy ** 2
 
@@ -106,3 +105,7 @@ def main():
     
     y_pred, sigma = get_prediction(gp)
     get_plot(x, y_pred, sigma)
+
+
+if __name__ == '__main__':
+    main()
