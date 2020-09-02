@@ -7,7 +7,6 @@ from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
 
 
 
-
 def get_data():
     '''
     ===========================
@@ -29,7 +28,7 @@ def get_data():
     return(X, y)
 
 
-def get_estimator(kernel, alpha=dy ** 2, n_restarts_optimizer=10):
+def get_estimator(kernel, alpha, n_restarts_optimizer=10):
     '''
     ===========================
     Input: 
@@ -37,13 +36,14 @@ def get_estimator(kernel, alpha=dy ** 2, n_restarts_optimizer=10):
     ===========================
     '''
     # Instantiate a Gaussian Process model
-    gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha,
+    gp = GaussianProcessRegressor(kernel=kernel, 
+                                  alpha=alpha,
                                   n_restarts_optimizer=n_restarts_optimizer)
 
     return(gp)
 
 
-def fit_estimator(X, y): 
+def fit_estimator(X, y, gp): 
     '''
     ===========================
     Input: 
@@ -95,6 +95,14 @@ def main():
     Output:
     ===========================
     '''
+    
+    
+    kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
+    alpha = dy ** 2
+
     X, y = get_data()
-    gp = get_estimator(kernel)
+    gp = get_estimator(kernel, alpha)
+    gp_fit = fit_estimator(X, y, gp)
+    
     y_pred, sigma = get_prediction(gp)
+    get_plot(x, y_pred, sigma)
