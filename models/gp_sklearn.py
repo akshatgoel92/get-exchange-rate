@@ -4,16 +4,19 @@ import numpy as np
 from src import fetch
 from matplotlib import pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel as wn
 
 
 def f(x):
-    """The function to predict."""
+    """
+    ===========================
+    The function to predict
+    ===========================
+    """
     return x * np.sin(x)
 
 
-
-def get_estimator(kernel, alpha, n_restarts_optimizer=10):
+def get_estimator(kernel, alpha=0.0, n_restarts_optimizer=0):
     '''
     ===========================
     Input: 
@@ -47,10 +50,10 @@ def get_prediction(X, gp):
     ===========================
     ''' 
     # Make the prediction on the meshed x-axis (ask for MSE as well)
-    return(gp.predict(X, return_std=True))
+    return(gp.predict(X, return_cov=True))
 
 
-def get_plot(X, x, y, dy, y_pred, sigma):
+def get_plot(X, x, y, y_mean, y_cov):
     '''
     ===========================
     Input: 
@@ -58,22 +61,15 @@ def get_plot(X, x, y, dy, y_pred, sigma):
     ===========================
     '''
     # Plot the function, the prediction and the 95% confidence interval based on # the MSE
-    plt.figure()
-    
-    plt.plot(x, f(x), 'r:', label=r'$f(x) = x\,\sin(x)$')
-    plt.errorbar(X.ravel(), y, dy, fmt='r.', markersize=10, label='Observations')
-    plt.plot(x, y_pred, 'b-', label='Prediction')
-    plt.fill(np.concatenate([x, x[::-1]]),
-             np.concatenate([y_pred - 1.9600 * sigma,
-                            (y_pred + 1.9600 * sigma)[::-1]]),
-             alpha=.5, fc='b', ec='None', label='95% confidence interval')
-    
-    plt.xlabel('$x$')
-    plt.ylabel('$f(x)$')
-    plt.ylim(-10, 20)
-    
-    plt.legend(loc='upper left')
-    plt.show()
+    plt.plot(X, y_mean, 'k', lw=3, zorder=9)
+    plt.fill_between(X, y_mean - np.sqrt(np.diag(y_cov)),
+                     y_mean + np.sqrt(np.diag(y_cov)),
+                     alpha=0.5, color='k')
+    plt.scatter(X[:, 0], y, c='r', s=50, zorder=10, edgecolors=(0, 0, 0))
+    plt.title("Initial: %s\nOptimum: %s\nLog-Marginal-Likelihood: %s"
+              % (kernel, gp.kernel_,
+                 gp.log_marginal_likelihood(gp.kernel_.theta)))
+    plt.tight_layout()
 
 
 def main():
@@ -83,15 +79,16 @@ def main():
     Output:
     ===========================
     '''
-    kernel = C(1.0, (1e-3, 1e3)) * RBF(10, (1e-2, 1e2))
-    X, x, y, dy = fetch.get_data()
-    alpha = dy ** 2
-
-    gp = get_estimator(kernel, alpha)
+    _, _, X, x, y = fetch.main()
+    kernel = 1.0 * RBF(length_scale=100.0, length_scale_bounds=(1e-2, 1e3)) + \
+             wn(noise_level=1, noise_level_bounds=(1e-10, 1e+1))
+    
+    gp = get_estimator(kernel)
     gp_fit = fit_estimator(X, y, gp)
     
-    y_pred, sigma = get_prediction(x, gp_fit)
-    get_plot(X, x, y, dy, y_pred, sigma)
+    y_mean, y_cov = get_prediction(x, gp_fit)
+
+    get_plot(X, x, y, y_mean, y_cov)
 
 
 if __name__ == '__main__':

@@ -93,7 +93,7 @@ def get_gp_torch_data(df):
     return(train_x, train_y)
 
 
-def get_gp_sk_data(df):
+def get_gp_sk_data(df, lag=1):
     '''
     ===========================
     Input: 
@@ -101,12 +101,14 @@ def get_gp_sk_data(df):
     ===========================
     '''
     # Now the noisy case
-    X = np.array(df['INR'].shift(1)[1:]).float()
+    X = np.array(df['INR'].shift(1)[lag:])
     X = np.atleast_2d(X).T
     
     # Make a mesh for visualization
     x = np.atleast_2d(np.linspace(0, 5, 150)).T
-	y = np.array(df['INR'][:-1]).float()
+
+    # Observations and noise
+    y = np.array(df['INR'][:-lag])
 
     return(X, x, y)
 
@@ -127,9 +129,9 @@ def main():
 	
 	df = get_moving_avg(df)
 	sum = summarize_data(df)
-	train_x, train_y = get_gp_data(df)
+	X, x, y = get_gp_sk_data(df)
 
-	return(sum, df, train_x, train_y)
+	return(sum, df, X, x, y)
 	
 
 if __name__ == '__main__':
