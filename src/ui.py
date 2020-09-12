@@ -23,18 +23,12 @@ def get_plot(df):
     fig = go.Figure()
     
     fig.add_trace(go.Scatter(x=df.index, 
-                             y=df.INR,
-                             mode='lines',
-                             name='Spot Rate',
-                             line=dict(color='Black', width=1, dash='longdash')))
-    
-    fig.add_trace(go.Scatter(x=df.index, 
-                             y=df.sma,
+                             y=df.SMA,
                              mode='lines',
                              name='Short-term avg.'))
     
     fig.add_trace(go.Scatter(x=df.index, 
-                             y=df.lma,
+                             y=df.LMA,
                              mode='lines', 
                              name='Long-term avg.'))
 
@@ -48,11 +42,11 @@ def get_plot(df):
                                         y=-0.17,
                                         x=0,
                                         showarrow=False,
-                                        text ="""Data Source: European Central Bank."""), 
+                                        text ="""Data Source: European Central Bank"""), 
                                      dict(
                                         xref='paper',
                                         yref='paper',
-                                        y=-0.199,
+                                        y=-0.205,
                                         x=0,
                                         showarrow=False,
                                         text ='Buy GBP if red crosses green from below. Sell GBP if red crosses green from above.')])
@@ -71,12 +65,12 @@ def get_dash_table(df):
                                  columns=[{"name": i.upper(), "id": i} 
                                           for i in df.columns],
                                  data=df.round(2).to_dict('records'), 
-                                 style_header={ 'border': '1px solid black'},
-                                 style_cell={ 'border': '1px solid grey', 
-                                              'minWidth': '10%', 
-                                              'width': '10%', 
-                                              'maxWidth': '10%',
-                                              'textAlign': 'left'}, 
-                                 style_table={ 'width': '20%', 'margin': '7%'},)
+                                 style_header={'border': '1px solid black'},
+                                 style_cell={'border': '1px solid grey', 
+                                             'minWidth': '10%', 
+                                             'width': '10%', 
+                                             'maxWidth': '10%',
+                                             'textAlign': 'left'}, 
+                                 style_table={'width': '20%', 'padding': '6%'})
 
     return(table)

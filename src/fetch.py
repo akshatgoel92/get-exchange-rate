@@ -1,3 +1,8 @@
+
+# Datetime
+from datetime import date
+from datetime import timedelta
+
 # Imports
 import pandas as pd 
 import numpy as np
@@ -13,66 +18,71 @@ import torch
 
 
 def get_data(start, end, target, base):
-	'''
-	----------------------------
-	Get request for time series
-	----------------------------
-	'''
-	args = 'start_at={}&end_at={}&symbols={}&base={}'
-	url = 'https://api.exchangeratesapi.io/history?' + args
-	response = requests.get(url.format(start, end, target, base))
+    '''
+    ----------------------------
+    Get request for time series
+    ----------------------------
+    '''
+    args = 'start_at={}&end_at={}&symbols={}&base={}'
+    url = 'https://api.exchangeratesapi.io/history?' + args
+    response = requests.get(url.format(start, end, target, base))
 
-	return(response)
+    return(response)
+
 
 
 def parse_data(df_string):
-	'''
-	----------------------
-	Parse the API response
-	----------------------
-	'''
-	df = pd.DataFrame(json.loads(df_string)['rates']).T
-	df.index = pd.to_datetime(df.index)
-	df = df.sort_index()
+    '''
+    ----------------------
+    Parse the API response
+    ----------------------
+    '''
+    df = pd.DataFrame(json.loads(df_string)['rates']).T
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
 
-	return(df)
+    return(df)
 
 
 
 def get_moving_avg(df, sma=30, lma=200):
-	'''
-	------------------
-	Add moving avgs
-	------------------
-	'''
-	df['sma'] = df['INR'].rolling(window=sma).mean()
-	df['lma'] = df['INR'].rolling(window=lma).mean()
+    '''
+    ------------------
+    Add moving avgs
+    ------------------
+    '''
+    df['SMA'] = df['INR'].rolling(window=sma).mean()
+    df['LMA'] = df['INR'].rolling(window=lma).mean()
 
-	return(df)
+    return(df)
 
 
 
 def get_long_dates(df):
-	'''
-	------------------
-	Add moving avgs
-	------------------
-	'''
-	df['long'] = (df['sma'] > df['lma']).astype(int) 
+    '''
+    ------------------
+    Add moving avgs
+    ------------------
+    '''
+    df['long'] = (df['SMA'] > df['LMA']).astype(int) 
 
-	return(df)
+    return(df)
 
 
 
 def summarize_data(df):
-	'''
-	------------------
-	Make a line graph
-	------------------
-	'''
-	sum = df.describe()
-	
-	return(sum)
+    '''
+    ------------------
+    Make a line graph
+    ------------------
+    '''
+    sum = df.describe()
+    sum['Description'] = sum.index
+
+    sum['Description'] = sum['Description'].apply(lambda x: str(x).title())
+    sum = sum[['Description', 'SMA', 'LMA']] 
+
+    return(sum)
 
 
 
@@ -91,6 +101,7 @@ def get_gp_torch_data(df):
     train_y = torch.autograd.Variable(train_y).float()
 
     return(train_x, train_y)
+
 
 
 def get_gp_sk_data(df, lag=1):
@@ -115,25 +126,29 @@ def get_gp_sk_data(df, lag=1):
 
 
 def main():
-	'''
-	------------------
-	Execution goes here
-	------------------
-	'''
-	args = {'start': '2009-01-01', 'end': '2020-08-26', 
-			'target': 'INR', 
-			'base': 'GBP'}
+    '''
+    ------------------
+    Execution goes here
+    ------------------
+    '''
+    yesterday = (date.today() - timedelta(1)).strftime("%Y-%m-%d")
+    sma_lag = 30
+    lma_lag = 200
+    
+    args = {'start': '2009-01-01', 'end': yesterday, 
+            'target': 'INR', 
+            'base': 'GBP'}
 
-	response = get_data(**args)
-	df = parse_data(response.text)
-	
-	df = get_moving_avg(df)
-	sum = summarize_data(df)
-	X, x, y = get_gp_sk_data(df)
+    response = get_data(**args)
+    df = parse_data(response.text)
+    df = get_moving_avg(df, sma_lag, lma_lag)
+    
+    sum = summarize_data(df)
+    X, x, y = get_gp_sk_data(df)
 
-	return(sum, df, X, x, y)
-	
+    return(sum, df, X, x, y)
+    
 
 if __name__ == '__main__':
 
-	main()
+    main()

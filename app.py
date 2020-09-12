@@ -18,7 +18,6 @@ from src import ui
 # Get summary and graph
 sum, df, _, _, _ = fetch.main()
 
-
 # Load UI styles
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
