@@ -22,21 +22,41 @@ def get_plot(df):
     '''
     fig = go.Figure()
     
-    fig.add_trace(go.Scatter(x=df.index, y=df.INR,
+    fig.add_trace(go.Scatter(x=df.index, 
+                             y=df.INR,
                              mode='lines',
-                             name='Spot Rate'))
+                             name='Spot Rate',
+                             line=dict(color='Black', width=1, dash='longdash')))
     
-    fig.add_trace(go.Scatter(x=df.index, y=df.sma,
+    fig.add_trace(go.Scatter(x=df.index, 
+                             y=df.sma,
                              mode='lines',
                              name='Short-term avg.'))
     
-    fig.add_trace(go.Scatter(x=df.index, y=df.lma,
+    fig.add_trace(go.Scatter(x=df.index, 
+                             y=df.lma,
                              mode='lines', 
                              name='Long-term avg.'))
 
     fig.update_layout(title='GBP INR Over Time',
                       xaxis_title='Date',
-                      yaxis_title='INR')
+                      yaxis_title='INR', 
+                      height = 575, 
+                      annotations = [dict(
+                                        xref='paper',
+                                        yref='paper',
+                                        y=-0.17,
+                                        x=0,
+                                        showarrow=False,
+                                        text ="""Data Source: European Central Bank."""), 
+                                     dict(
+                                        xref='paper',
+                                        yref='paper',
+                                        y=-0.199,
+                                        x=0,
+                                        showarrow=False,
+                                        text ='Buy GBP if red crosses green from below. Sell GBP if red crosses green from above.')])
+
 
     return(fig)
 

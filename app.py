@@ -16,9 +16,7 @@ from src import fetch
 from src import ui
 
 # Get summary and graph
-sum, df = fetch.main()
-
-# Get machine learning predictions
+sum, df, _, _, _ = fetch.main()
 
 
 # Load UI styles
@@ -31,7 +29,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 graph = dcc.Graph(figure=ui.get_plot(df))
 
 # Table
-table = ui.gen_dash_table(sum)
+table = ui.get_dash_table(sum)
 
 # Create app layout
 app.layout = html.Div([graph, table])
